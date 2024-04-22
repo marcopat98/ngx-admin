@@ -8,6 +8,9 @@ import {
   NbRequestPasswordComponent,
   NbResetPasswordComponent,
 } from '@nebular/auth';
+import { AuthLoginComponent } from './pages/auth/login/auth-login.component';
+import { AuthCallbackComponent } from './pages/auth/callback/auth-callback.component';
+import { AuthLogoutComponent } from './pages/auth/logout/auth-logout.component';
 
 export const routes: Routes = [
   {
@@ -16,34 +19,22 @@ export const routes: Routes = [
       .then(m => m.PagesModule),
   },
   {
-    path: 'auth',
+    path: 'keycloak-auth',
     component: NbAuthComponent,
     children: [
       {
         path: '',
-        component: NbLoginComponent,
+        component: AuthLoginComponent,
       },
       {
-        path: 'login',
-        component: NbLoginComponent,
-      },
-      {
-        path: 'register',
-        component: NbRegisterComponent,
+        path: 'callback',
+        component: AuthCallbackComponent,
       },
       {
         path: 'logout',
-        component: NbLogoutComponent,
-      },
-      {
-        path: 'request-password',
-        component: NbRequestPasswordComponent,
-      },
-      {
-        path: 'reset-password',
-        component: NbResetPasswordComponent,
-      },
-    ],
+        component: AuthLogoutComponent,
+      }
+    ]
   },
   { path: '', redirectTo: 'pages', pathMatch: 'full' },
   { path: '**', redirectTo: 'pages' },

@@ -26,7 +26,10 @@
   ::ng-deep nb-search button {
     padding: 0!important;
   }
-
+  .logo img {
+    max-height: 50px; // o l'altezza desiderata
+    width: auto; // mantiene le proporzioni dell'immagine
+  }
   .header-container {
     display: flex;
     align-items: center;
@@ -40,6 +43,10 @@
       nb-icon {
         font-size: 1.75rem;
       }
+    }
+
+    nb-icon{
+      color:#ec441c;
     }
 
     .logo {

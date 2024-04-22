@@ -52,6 +52,9 @@ import { StatsProgressBarService } from './mock/stats-progress-bar.service';
 import { VisitorsAnalyticsService } from './mock/visitors-analytics.service';
 import { SecurityCamerasService } from './mock/security-cameras.service';
 import { MockDataModule } from './mock/mock-data.module';
+import { NbAuthOAuth2JWTToken, NbOAuth2AuthStrategy } from '@nebular/auth';
+import { OidcJWTToken } from '../../app/pages/auth/oidc/oidc';
+import { OidcUserInformationService } from '../../app/pages/auth/services/oidc-user-information.service';
 
 const socialLinks = [
   {
@@ -103,46 +106,22 @@ export class NbSimpleRoleProvider extends NbRoleProvider {
 export const NB_CORE_PROVIDERS = [
   ...MockDataModule.forRoot().providers,
   ...DATA_SERVICES,
-  ...NbAuthModule.forRoot({
-
-    strategies: [
-      NbDummyAuthStrategy.setup({
-        name: 'email',
-        delay: 3000,
-      }),
-    ],
-    forms: {
-      login: {
-        socialLinks: socialLinks,
-      },
-      register: {
-        socialLinks: socialLinks,
-      },
-    },
-  }).providers,
-
-  NbSecurityModule.forRoot({
-    accessControl: {
-      guest: {
-        view: '*',
-      },
-      user: {
-        parent: 'guest',
-        create: '*',
-        edit: '*',
-        remove: '*',
-      },
-    },
-  }).providers,
-
-  {
-    provide: NbRoleProvider, useClass: NbSimpleRoleProvider,
-  },
   AnalyticsService,
   LayoutService,
-  PlayerService,
   SeoService,
   StateService,
+  ...NbAuthModule.forRoot({
+    strategies: [
+      NbOAuth2AuthStrategy.setup({
+        name: 'oidc',
+        clientId: '',
+        token: {
+          class: OidcJWTToken
+        }
+      }),
+    ],
+  }).providers,
+  { provide: NbRoleProvider, useClass: OidcUserInformationService },
 ];
 
 @NgModule({

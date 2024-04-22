@@ -1,0 +1,14 @@
+{
+  "dashboardBaseURL":"http://localhost:4200",
+  "idmBaseURL":"http://localhost:8085",
+  "idmRealmName": "Tema",
+  "authProfile": "oidc",
+  "client_id": "tema",
+  "client_secret": "hEi7Lj8hkBNP0GEGT9kKKs7cpFcRONlw",
+  "enableAuthentication":true,
+  "clientSecret": "hEi7Lj8hkBNP0GEGT9kKKs7cpFcRONlw",
+  "idra_base_url":"http://localhost:8085",
+  "SUBSCRIPTION_USER":"rita.gaeta@eng.it",
+  "SUBSCRIPTION_PWD":"Spotted_2023"
+
+}

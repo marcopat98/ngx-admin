@@ -13,11 +13,12 @@
 
     a {
       padding: 0.4rem;
-      color: nb-theme(text-hint-color);
+      color:#ec441c;
       transition: color ease-out 0.1s;
 
       &:hover {
         color: nb-theme(text-basic-color);
+        color:#ada7a5;
       }
     }
   }

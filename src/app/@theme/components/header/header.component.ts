@@ -1,10 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NbMediaBreakpointsService, NbMenuService, NbSidebarService, NbThemeService } from '@nebular/theme';
+import { NbMediaBreakpointsService, NbMenuService, NbSidebarService, NbThemeService, NbMenuItem } from '@nebular/theme';
 
 import { UserData } from '../../../@core/data/users';
 import { LayoutService } from '../../../@core/utils';
-import { map, takeUntil } from 'rxjs/operators';
+import {filter, map, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { UserClaims } from '../../../pages/auth/oidc/oidc';
+import { ConfigService } from '@ngx-config/core';
+import { Router } from '@angular/router';
+import { OidcUserInformationService } from '../../../pages/auth/services/oidc-user-information.service';
+
+
+
+
 
 @Component({
   selector: 'ngx-header',
@@ -15,45 +23,46 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   private destroy$: Subject<void> = new Subject<void>();
   userPictureOnly: boolean = false;
-  user: any;
-
-  themes = [
-    {
-      value: 'default',
-      name: 'Light',
-    },
-    {
-      value: 'dark',
-      name: 'Dark',
-    },
-    {
-      value: 'cosmic',
-      name: 'Cosmic',
-    },
-    {
-      value: 'corporate',
-      name: 'Corporate',
-    },
-  ];
-
+  user: UserClaims;
+  userMenuDefault: NbMenuItem[] = [];
+  authenticationEnabled:boolean=false;
   currentTheme = 'default';
 
-  userMenu = [ { title: 'Profile' }, { title: 'Log out' } ];
+  userMenu: NbMenuItem[] = [];
 
   constructor(private sidebarService: NbSidebarService,
               private menuService: NbMenuService,
               private themeService: NbThemeService,
-              private userService: UserData,
+              private userService: OidcUserInformationService,
               private layoutService: LayoutService,
-              private breakpointService: NbMediaBreakpointsService) {
+              private configService: ConfigService,
+              private breakpointService: NbMediaBreakpointsService,
+              private router: Router,
+              ) {
+
   }
+
 
   ngOnInit() {
     this.currentTheme = this.themeService.currentTheme;
+    console.log(this.user);
+    this.authenticationEnabled=this.configService.getSettings("enableAuthentication");
 
-    this.userService.getUsers()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((users: any) => this.user = users.nick);
+    this.userMenuDefault = [
+      {
+        title: "Login",
+        data: { tag: "login" },
+       url: `${this.configService.getSettings('dashboardBaseURL')}/keycloak-auth/`
+      },
+    ];
+    this.userMenu = [
+      { title: 'Profile', url: `${this.configService.getSettings('idmBaseURL')}/auth/realms/${this.configService.getSettings('idmRealmName')}/account`,target:'_blank' },
+      { title: 'Log out', data: { tag: "logout" }, url:`${this.configService.getSettings('dashboardBaseURL')}/keycloak-auth/logout` }
+    ]
+
+    this.userService.onUserChange()
+    .subscribe((user: any) => {this.user = user; console.log(this.user);  console.log("updateUser");
+    });
 
     const { xl } = this.breakpointService.getBreakpointsMap();
     this.themeService.onMediaQueryChange()
@@ -69,6 +78,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe(themeName => this.currentTheme = themeName);
+      this.menuService.onItemClick()
+      .pipe(
+        filter(({ tag }) => tag === 'user-menu'),
+        map(({ item: { data } }) => data),
+      )
+      .subscribe(res => {
+        if (res["tag"] == "logout") {
+          this.router.navigate([`localhost:4200/keycloak-auth/logout`]);
+        }
+      });
   }
 
   ngOnDestroy() {

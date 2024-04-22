@@ -6,4 +6,7 @@
   .menu-sidebar ::ng-deep .scrollable {
     padding-top: nb-theme(layout-padding-top);
   }
+  nb-menu .menu-item a {
+    color:#ec441c!important;
+  }
 }
